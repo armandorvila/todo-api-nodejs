@@ -5,6 +5,10 @@ const request = require('supertest').agent(app.listen());
 
 const users = require('../data/users.data');
 const User = require('../../models/users.model');
+
+const tasks = require('../data/tasks.data');
+const Task = require('../../models/tasks.model');
+
 const db = require('../helpers/db.helper');
 
 const auth = require('../helpers/auth.helper')(request);
@@ -14,11 +18,11 @@ const { expect } = require('chai');
 describe('user routes', function () {
 
     before(function (done) {
-        db.setup(User, users, done);
+        db.setupAll(User, users, Task, tasks, done);
     });
 
     after(function (done) {
-        db.cleanup(User, done);
+        db.cleanupAll(User, Task, done);
     });
 
     it('should return a 200 on GET /users/:id', function (done) {
@@ -47,6 +51,19 @@ describe('user routes', function () {
                     expect(err).to.not.exist;
                     expect(res.body).have.property('success');
                     expect(res.body.success).to.be.equal(false);
+                    done();
+                });
+        });
+    });
+
+    it('should return a 200 on GET /users/:id/tasks', function (done) {
+        const id = '59945ddeca729e3398985ea7';
+        auth.login(users[0]).then((res) => {
+            request.get(`/users/${id}/tasks`).set('x-access-token', res.body.token)
+                .expect(200).expect('Content-Type', /json/)
+                .end((err, res) => {
+                    expect(err).to.not.exist;
+                    expect(res.body.length).to.be.equal(2);
                     done();
                 });
         });
