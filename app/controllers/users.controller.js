@@ -4,6 +4,7 @@ const passwordHash = require('password-hash');//TODO use another module with asy
 
 const logger = require("../config/logger");
 const User = require("../models/users.model");
+const Task = require("../models/tasks.model");
 
 class UsersController {
 
@@ -14,6 +15,31 @@ class UsersController {
                 if (user) {
                     logger.debug(`User ${req.params.id} found.`)
                     res.json(user)
+                }
+                else {
+                    logger.debug(`User ${req.params.id} not found.`)
+                    res.status(404).json({ success: false, message: `User ${req.params.id} not found.` });
+                }
+            })
+            .catch((err) => {
+                logger.error(`Error finding user ${req.params.id}: ${err.message}`);
+                res.status(500).json({ success: false, message: err.message });
+            });
+    }
+
+    findUserTasks(req, res, next) {
+        User.findOne({ _id: req.params.id }, { explicit: true }).select('email firstName lastName').exec()
+            .then((user) => {
+
+                if (user) {
+                    logger.debug(`User ${req.params.id} found.`)
+
+                    Task.find({ asignee: user.id }).exec().then((tasks) => {
+                        res.json(tasks);
+                    }).catch((err) => {
+                        logger.error(`Error finding tasks for user ${req.params.id}: ${err.message}`);
+                        res.status(500).json({ success: false, message: err.message });
+                    });
                 }
                 else {
                     logger.debug(`User ${req.params.id} not found.`)
