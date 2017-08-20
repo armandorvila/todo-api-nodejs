@@ -22,7 +22,7 @@ To implement the REST API just fork the repository and open a new pull request f
 8. As a user I should be able to sort my todo list by priority. => It's covered by feture 7.
 9. As a user I should be able to set a item as completed (and list completed items).
 10. As a user I should be able to assign a task to another user using github id.
-11. As a user I should be able to list tasks assigned to a github user => Not implemented. Out of time.
+11. As a user I should be able to list tasks assigned to a github user
 
 
 # Build
